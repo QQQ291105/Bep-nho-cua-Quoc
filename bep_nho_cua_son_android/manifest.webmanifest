@@ -1,0 +1,25 @@
+{
+  "name": "Bếp nhỏ của Sơn",
+  "short_name": "Bếp nhỏ",
+  "description": "Quản lý ngân sách thực phẩm và chi tiêu cá nhân",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f7f4",
+  "theme_color": "#183d32",
+  "lang": "vi",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

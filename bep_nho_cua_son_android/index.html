@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#183d32">
+<meta name="description" content="Quản lý ngân sách thực phẩm, chi tiêu và danh sách đi chợ của Sơn.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Bếp nhỏ của Sơn</title>
+<style>
+:root{--green:#183d32;--green2:#28634e;--mint:#e7f1e9;--bg:#f5f7f4;--card:#fff;--ink:#1e2923;--muted:#68756d;--line:#e3e9e3;--red:#b94d45;--amber:#a66b13;--shadow:0 4px 18px #1b38200c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:var(--green);color:white;padding:18px 16px 15px;position:sticky;top:0;z-index:5}
+.head{max-width:900px;margin:auto;display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border-radius:14px;background:#e4efe4;color:var(--green);display:grid;place-items:center;font-size:24px}
+h1{font-size:20px;margin:0}header p{margin:2px 0 0;color:#d3e4d8;font-size:12px}
+nav{display:flex;gap:6px;max-width:900px;margin:12px auto 0;overflow:auto}
+nav button{white-space:nowrap;border:0;background:#ffffff1c;color:#e8f0e9;padding:9px 13px;border-radius:999px;font-weight:650}
+nav button.active{background:#f3f7f2;color:var(--green)}
+main{max-width:900px;margin:auto;padding:16px 14px 90px}.page{display:none}.page.active{display:block}
+h2{font-size:19px;margin:4px 0 12px}h3{font-size:15px;margin:0 0 10px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:14px;box-shadow:var(--shadow);margin-bottom:12px}
+.kpi small,.muted{color:var(--muted)}.kpi strong{display:block;font-size:22px;margin-top:5px;letter-spacing:-.5px}.green{color:var(--green2)}.red{color:var(--red)}.amber{color:var(--amber)}
+.progress{height:9px;background:#e9eee9;border-radius:20px;overflow:hidden;margin:9px 0}.progress span{display:block;height:100%;background:#438668;border-radius:20px;width:0}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.row.wrap{flex-wrap:wrap}.sub{font-size:12px;color:var(--muted)}
+label{display:block;font-size:13px;font-weight:650;margin:10px 0 5px}input,select,textarea{width:100%;padding:11px 12px;border:1px solid #d9e2da;border-radius:11px;background:white;color:var(--ink);font:inherit;min-height:43px}
+button,.btn{cursor:pointer;font:inherit}.primary{border:0;background:var(--green2);color:white;padding:11px 15px;border-radius:11px;font-weight:700}.secondary{border:1px solid var(--line);background:white;color:var(--green);padding:10px 13px;border-radius:11px;font-weight:650}.danger{border:1px solid #f0d4d1;background:#fff8f7;color:var(--red);padding:7px 10px;border-radius:9px}.full{width:100%}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.formgrid .wide{grid-column:1/-1}
+.list{display:flex;flex-direction:column;gap:8px}.item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}.item strong{display:block}.item small{color:var(--muted)}
+.pill{font-size:11px;background:var(--mint);color:var(--green);padding:4px 8px;border-radius:999px;white-space:nowrap}
+.empty{text-align:center;color:var(--muted);padding:20px 8px}
+.barlist{display:flex;flex-direction:column;gap:10px}.barrow{display:grid;grid-template-columns:100px 1fr 88px;gap:8px;align-items:center;font-size:12px}.bar{height:9px;background:#edf1ed;border-radius:20px;overflow:hidden}.bar i{display:block;height:100%;background:#4d8c6d;border-radius:20px}
+table{border-collapse:collapse;width:100%;font-size:13px}td,th{text-align:left;padding:9px 5px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:600}
+.check{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--line)}.check input{width:18px;min-height:18px}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:20px}
+dialog{border:0;border-radius:18px;padding:18px;width:min(92vw,440px);box-shadow:0 15px 60px #0003}dialog::backdrop{background:#10201988}
+@media(min-width:650px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.two{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}.two .card{height:fit-content}}
+@media(max-width:380px){.formgrid{grid-template-columns:1fr}.formgrid .wide{grid-column:auto}.barrow{grid-template-columns:80px 1fr 75px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="head"><div class="logo">🥬</div><div><h1>Bếp nhỏ của Sơn</h1><p>Quản lý chi tiêu thực phẩm · Thanh đạm · Tiết kiệm</p></div></div>
+ <nav id="nav">
+  <button class="active" data-page="home">Tổng quan</button><button data-page="transactions">Sổ chi tiêu</button><button data-page="stats">Thống kê</button><button data-page="shopping">Đi chợ</button><button data-page="settings">Cài đặt & sao lưu</button>
+ </nav>
+</header>
+<main>
+<section class="page active" id="home">
+ <div class="row wrap"><h2>Tổng quan tuần</h2><span class="pill" id="weekLabel"></span></div>
+ <div class="card">
+  <div class="row"><div><div class="sub">NGÂN SÁCH TUẦN</div><div style="font-size:27px;font-weight:800" id="budgetDisplay">1.000.000đ</div></div><span class="pill">Mục tiêu chi tiêu</span></div>
+  <div class="progress"><span id="budgetProgress"></span></div>
+  <div class="row"><span class="sub" id="spentLabel">Đã chi: 0đ</span><strong id="remainingLabel" class="green">Còn: 1.000.000đ</strong></div>
+  <div class="sub" id="budgetHint" style="margin-top:8px">Bạn đang trong ngân sách.</div>
+ </div>
+ <div class="grid">
+  <div class="card kpi"><small>Chi trong tuần</small><strong id="weekSpent">0đ</strong></div>
+  <div class="card kpi"><small>Chi trong tháng</small><strong id="monthSpent">0đ</strong></div>
+  <div class="card kpi"><small>Số giao dịch</small><strong id="txCount">0</strong></div>
+  <div class="card kpi"><small>Trung bình/ngày</small><strong id="dailyAvg">0đ</strong></div>
+ </div>
+ <div class="two">
+  <div class="card"><h3>Thêm khoản chi nhanh</h3>
+   <form id="quickForm">
+    <label>Tên khoản chi</label><input name="title" required placeholder="Ví dụ: Rau muống, trứng...">
+    <div class="formgrid"><div><label>Số tiền (đ)</label><input name="amount" type="number" min="1" required placeholder="35000"></div><div><label>Danh mục</label><select name="category"><option>Thịt, cá, trứng, đậu</option><option>Rau củ</option><option>Tinh bột</option><option>Trái cây</option><option>Sữa</option><option>Gia vị</option><option>Đồ uống</option><option>Khác</option></select></div></div>
+    <label>Ngày mua</label><input name="date" type="date" required>
+    <label>Ghi chú (không bắt buộc)</label><input name="note" placeholder="Chợ / siêu thị...">
+    <button class="primary full" style="margin-top:13px">+ Lưu khoản chi</button>
+   </form>
+  </div>
+  <div class="card"><h3>Chi tiêu gần đây</h3><div id="recentList" class="list"></div></div>
+ </div>
+</section>
+
+<section class="page" id="transactions">
+ <div class="row wrap"><h2>Sổ chi tiêu</h2><button class="secondary" id="showAdd">+ Thêm khoản chi</button></div>
+ <div class="card">
+  <div class="formgrid"><div><label>Từ ngày</label><input type="date" id="filterFrom"></div><div><label>Đến ngày</label><input type="date" id="filterTo"></div><div class="wide"><label>Lọc danh mục</label><select id="filterCategory"><option value="">Tất cả danh mục</option><option>Thịt, cá, trứng, đậu</option><option>Rau củ</option><option>Tinh bột</option><option>Trái cây</option><option>Sữa</option><option>Gia vị</option><option>Đồ uống</option><option>Khác</option></select></div></div>
+ </div>
+ <div class="card"><div class="row"><h3>Danh sách giao dịch</h3><strong id="filterTotal">0đ</strong></div><div id="transactionList" class="list"></div></div>
+</section>
+
+<section class="page" id="stats">
+ <h2>Thống kê chi tiêu</h2>
+ <div class="card"><div class="row wrap"><div><label>Khoảng thời gian</label><select id="statsRange"><option value="week">Tuần này</option><option value="month" selected>Tháng này</option><option value="all">Toàn bộ dữ liệu</option></select></div><div><div class="sub">TỔNG ĐÃ CHI</div><strong style="font-size:24px" id="statsTotal">0đ</strong></div></div></div>
+ <div class="card"><h3>Chi theo danh mục</h3><div class="barlist" id="categoryBars"></div></div>
+ <div class="card"><h3>Chi tiêu theo ngày</h3><div class="barlist" id="dailyBars"></div></div>
+ <div class="card"><h3>Tóm tắt</h3><div id="statsSummary" class="list"></div></div>
+</section>
+
+<section class="page" id="shopping">
+ <h2>Danh sách đi chợ</h2>
+ <div class="card"><div class="row"><div><div class="sub">TỔNG DỰ TOÁN</div><strong style="font-size:24px" id="shoppingTotal">0đ</strong></div><span class="pill" id="shoppingCount">0 món đã mua</span></div><div class="progress"><span id="shoppingProgress"></span></div></div>
+ <div class="card"><h3>Danh sách nguyên liệu mẫu</h3><div id="shoppingList"></div><p class="sub">Giá chỉ là dự toán ban đầu. Bạn có thể sửa giá ngay trong danh sách; đánh dấu mua không tự ghi nhận khoản chi để tránh tính trùng.</p></div>
+ <div class="card"><h3>Thêm món cần mua</h3><form id="shoppingForm" class="formgrid"><div class="wide"><label>Tên thực phẩm</label><input name="name" required placeholder="Ví dụ: Cải xanh"></div><div><label>Số lượng</label><input name="quantity" placeholder="1 bó"></div><div><label>Giá dự kiến (đ)</label><input name="price" type="number" min="0" placeholder="15000"></div><div class="wide"><button class="primary full">Thêm vào danh sách</button></div></form></div>
+</section>
+
+<section class="page" id="settings">
+ <h2>Cài đặt & sao lưu</h2>
+ <div class="card">
+  <h3>Ngân sách mặc định</h3><label>Ngân sách mỗi tuần (đồng)</label><input id="settingsBudget" type="number" min="0"><button class="primary full" id="saveBudget" style="margin-top:10px">Lưu ngân sách</button>
+ </div>
+ <div class="card">
+  <h3>Sao lưu dữ liệu</h3><p class="sub">Tải một bản sao gồm giao dịch, ngân sách và danh sách đi chợ. Hãy giữ file này khi đổi điện thoại hoặc trình duyệt.</p><button class="primary full" id="exportData">Tải bản sao lưu JSON</button>
+  <label>Khôi phục từ file sao lưu</label><input id="importFile" type="file" accept=".json,application/json"><button class="secondary full" id="importData" style="margin-top:8px">Khôi phục dữ liệu</button>
+  <button class="secondary full" id="exportCsv" style="margin-top:10px">Xuất sổ chi tiêu CSV</button>
+ </div>
+ <div class="card">
+  <h3>Quản lý dữ liệu</h3><p class="sub">Dữ liệu được lưu trên trình duyệt của thiết bị này. Xóa dữ liệu trình duyệt hoặc gỡ ứng dụng có thể làm mất dữ liệu nếu chưa sao lưu.</p><button class="danger full" id="resetData">Xóa toàn bộ dữ liệu ứng dụng</button>
+ </div>
+ <div class="card"><h3>Cài ứng dụng lên Android</h3><ol class="sub" style="padding-left:20px"><li>Mở đường dẫn ứng dụng bằng Chrome trên Android.</li><li>Nhấn menu ⋮ rồi chọn “Cài đặt ứng dụng” hoặc “Thêm vào màn hình chính”.</li><li>Xác nhận cài đặt. Ứng dụng sẽ có biểu tượng riêng.</li></ol><p class="sub">Cần đưa ứng dụng lên một website có HTTPS trước khi cài PWA. Xem hướng dẫn trong file README đi kèm.</p></div>
+ <div class="sub">Bếp nhỏ của Sơn · Phiên bản 1.0 · Dữ liệu lưu cục bộ</div>
+</section>
+</main>
+<footer>Bếp nhỏ của Sơn · Quản lý tài chính thực phẩm cá nhân</footer>
+
+<dialog id="editDialog"><form method="dialog" id="editForm"><h3 id="dialogTitle">Sửa khoản chi</h3><input type="hidden" name="id"><label>Tên khoản chi</label><input name="title" required><div class="formgrid"><div><label>Số tiền (đ)</label><input name="amount" type="number" min="1" required></div><div><label>Danh mục</label><select name="category"><option>Thịt, cá, trứng, đậu</option><option>Rau củ</option><option>Tinh bột</option><option>Trái cây</option><option>Sữa</option><option>Gia vị</option><option>Đồ uống</option><option>Khác</option></select></div></div><label>Ngày mua</label><input name="date" type="date" required><label>Ghi chú</label><input name="note"><div class="row" style="margin-top:15px"><button class="secondary" value="cancel">Hủy</button><button class="primary" id="saveEdit" value="save">Lưu thay đổi</button></div></form></dialog>
+<script>
+const KEY='bepNhoSon_v1';
+const defaults=[
+ {name:'Gạo',quantity:'3 kg',price:53000,category:'Tinh bột'},
+ {name:'Yến mạch',quantity:'500g',price:30000,category:'Tinh bột'},
+ {name:'Khoai lang',quantity:'1 kg',price:25000,category:'Tinh bột'},
+ {name:'Thịt gà',quantity:'700g',price:62000,category:'Đạm'},
+ {name:'Thịt heo nạc',quantity:'500g',price:66000,category:'Đạm'},
+ {name:'Cá',quantity:'700g',price:55000,category:'Đạm'},
+ {name:'Trứng gà',quantity:'10 quả',price:28000,category:'Đạm'},
+ {name:'Đậu phụ',quantity:'7 bìa',price:44000,category:'Đạm'},
+ {name:'Đậu xanh',quantity:'200g',price:12000,category:'Đậu và hạt'},
+ {name:'Đậu đen hoặc đậu đỏ',quantity:'200g',price:15000,category:'Đậu và hạt'},
+ {name:'Rau xanh',quantity:'2 kg',price:70000,category:'Rau củ'},
+ {name:'Bí đỏ, cà rốt, bắp cải',quantity:'2 kg',price:55000,category:'Rau củ'},
+ {name:'Nấm, cà chua, dưa leo',quantity:'Theo nhu cầu',price:45000,category:'Rau củ'},
+ {name:'Chuối',quantity:'1 kg',price:25000,category:'Trái cây'},
+ {name:'Đu đủ hoặc trái cây mùa',quantity:'1 kg',price:30000,category:'Trái cây'},
+ {name:'Sữa',quantity:'2 lít',price:82000,category:'Sữa'},
+ {name:'Mè',quantity:'100g',price:10000,category:'Đậu và hạt'},
+ {name:'Đậu phộng',quantity:'200g',price:15000,category:'Đậu và hạt'},
+ {name:'Dầu ăn, xì dầu, gia vị',quantity:'Bổ sung',price:50000,category:'Gia vị'}
+];
+let state=load();
+function load(){try{let x=JSON.parse(localStorage.getItem(KEY));if(x&&Array.isArray(x.transactions))return {...x,shopping:Array.isArray(x.shopping)?x.shopping:defaults.map((a,i)=>({...a,id:i+1,bought:false}))}}catch(e){}return {budget:1000000,transactions:[],shopping:defaults.map((a,i)=>({...a,id:i+1,bought:false}))}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}
+const fmt=n=>Number(n||0).toLocaleString('vi-VN')+'đ';
+const iso=d=>{let x=new Date(d.getTime()-d.getTimezoneOffset()*60000);return x.toISOString().slice(0,10)};
+const today=iso(new Date());
+document.querySelector('[name="date"]').value=today;
+function startWeek(d=new Date()){let x=new Date(d);x.setHours(0,0,0,0);let day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);return iso(x)}
+function inWeek(t){return t>=startWeek()&&t<=today}
+function monthKey(t){return t.slice(0,7)}
+function sum(arr){return arr.reduce((s,x)=>s+Number(x.amount||0),0)}
+function page(id){document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));if(id==='stats')renderStats();if(id==='transactions')renderTransactions()}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>page(b.dataset.page));
+function addTx(data){state.transactions.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random()),...data,amount:Number(data.amount)});save()}
+document.getElementById('quickForm').onsubmit=e=>{e.preventDefault();let f=new FormData(e.target);addTx(Object.fromEntries(f));e.target.reset();e.target.date.value=today;page('home')};
+document.getElementById('showAdd').onclick=()=>{page('home');document.querySelector('[name="title"]').focus()};
+function render(){
+ let week=state.transactions.filter(x=>inWeek(x.date)),month=state.transactions.filter(x=>monthKey(x.date)===monthKey(today)),ws=sum(week),ms=sum(month),left=state.budget-ws;
+ document.getElementById('weekLabel').textContent='Từ '+startWeek()+' đến '+today;
+ document.getElementById('budgetDisplay').textContent=fmt(state.budget);
+ document.getElementById('budgetProgress').style.width=Math.min(100,state.budget?ws/state.budget*100:0)+'%';
+ document.getElementById('spentLabel').textContent='Đã chi: '+fmt(ws);
+ let r=document.getElementById('remainingLabel');r.textContent=(left>=0?'Còn: ':'Vượt: ')+fmt(Math.abs(left));r.className=left>=0?'green':'red';
+ document.getElementById('budgetHint').textContent=left<0?'Bạn đã vượt ngân sách tuần. Hãy xem lại các khoản chi.':state.budget&&ws/state.budget>=.8?'Bạn đã dùng ít nhất 80% ngân sách tuần.':'Bạn đang trong ngân sách.';
+ document.getElementById('weekSpent').textContent=fmt(ws);document.getElementById('monthSpent').textContent=fmt(ms);document.getElementById('txCount').textContent=state.transactions.length;document.getElementById('dailyAvg').textContent=fmt(ws/Math.max(1,Math.ceil((new Date(today)-new Date(startWeek()))/86400000)+1));
+ let recent=[...state.transactions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+ document.getElementById('recentList').innerHTML=recent.length?recent.map(x=>txHTML(x,false)).join(''):'<div class="empty">Chưa có giao dịch.</div>';
+ document.getElementById('settingsBudget').value=state.budget;
+ renderTransactions();renderShopping();
+}
+function txHTML(x,actions=true){return `<div class="item"><div style="min-width:0"><strong>${esc(x.title)}</strong><small>${esc(x.date)} · ${esc(x.category||'Khác')}</small></div><div style="text-align:right;white-space:nowrap"><strong>${fmt(x.amount)}</strong>${actions?`<div style="margin-top:5px"><button class="secondary" data-edit="${x.id}" style="padding:4px 8px;font-size:11px">Sửa</button> <button class="danger" data-del="${x.id}">Xóa</button></div>`:''}</div></div>`}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderTransactions(){
+ let from=document.getElementById('filterFrom').value,to=document.getElementById('filterTo').value,cat=document.getElementById('filterCategory').value;
+ let arr=state.transactions.filter(x=>(!from||x.date>=from)&&(!to||x.date<=to)&&(!cat||x.category===cat)).sort((a,b)=>b.date.localeCompare(a.date));
+ document.getElementById('filterTotal').textContent=fmt(sum(arr));
+ document.getElementById('transactionList').innerHTML=arr.length?arr.map(x=>txHTML(x,true)).join(''):'<div class="empty">Không có khoản chi phù hợp.</div>';
+ document.getElementById('transactionList').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(confirm('Xóa khoản chi này?')){state.transactions=state.transactions.filter(x=>x.id!==b.dataset.del);save()}});
+ document.getElementById('transactionList').querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editTx(b.dataset.edit));
+}
+['filterFrom','filterTo','filterCategory'].forEach(id=>document.getElementById(id).addEventListener('change',renderTransactions));
+function editTx(id){let x=state.transactions.find(t=>t.id===id);if(!x)return;let f=document.getElementById('editForm');for(let k of ['id','title','amount','category','date','note'])f.elements[k].value=x[k]??'';document.getElementById('editDialog').showModal()}
+document.getElementById('editForm').onsubmit=e=>{if(e.submitter?.value==='cancel')return;e.preventDefault();let f=new FormData(e.target),id=f.get('id'),old=state.transactions.find(x=>x.id===id);if(old){Object.assign(old,{title:f.get('title'),amount:Number(f.get('amount')),category:f.get('category'),date:f.get('date'),note:f.get('note')});document.getElementById('editDialog').close();save()}};
+function renderStats(){
+ let range=document.getElementById('statsRange').value,arr=state.transactions.filter(x=>range==='all'||(range==='week'?inWeek(x.date):monthKey(x.date)===monthKey(today))),total=sum(arr);
+ document.getElementById('statsTotal').textContent=fmt(total);
+ let cats={};arr.forEach(x=>cats[x.category||'Khác']=(cats[x.category||'Khác']||0)+Number(x.amount));
+ let max=Math.max(1,...Object.values(cats));let entries=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+ document.getElementById('categoryBars').innerHTML=entries.length?entries.map(([k,v])=>`<div class="barrow"><span>${esc(k)}</span><div class="bar"><i style="width:${v/max*100}%"></i></div><strong style="text-align:right">${fmt(v)}</strong></div>`).join(''):'<div class="empty">Chưa có dữ liệu.</div>';
+ let days={};arr.forEach(x=>days[x.date]=(days[x.date]||0)+Number(x.amount));let de=Object.entries(days).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,14),dm=Math.max(1,...de.map(x=>x[1]));
+ document.getElementById('dailyBars').innerHTML=de.length?de.map(([k,v])=>`<div class="barrow"><span>${k.slice(5)}</span><div class="bar"><i style="width:${v/dm*100}%"></i></div><strong style="text-align:right">${fmt(v)}</strong></div>`).join(''):'<div class="empty">Chưa có dữ liệu.</div>';
+ let top=entries[0];document.getElementById('statsSummary').innerHTML=`<div class="item"><span>Tổng số giao dịch</span><strong>${arr.length}</strong></div><div class="item"><span>Trung bình/giao dịch</span><strong>${fmt(arr.length?total/arr.length:0)}</strong></div><div class="item"><span>Danh mục chi nhiều nhất</span><strong>${top?esc(top[0]):'Chưa có'}</strong></div>`;
+}
+document.getElementById('statsRange').onchange=renderStats;
+function renderShopping(){
+ let total=state.shopping.reduce((s,x)=>s+Number(x.price||0),0),count=state.shopping.filter(x=>x.bought).length;
+ document.getElementById('shoppingTotal').textContent=fmt(total);document.getElementById('shoppingCount').textContent=count+'/'+state.shopping.length+' món đã mua';document.getElementById('shoppingProgress').style.width=(state.shopping.length?count/state.shopping.length*100:0)+'%';
+ document.getElementById('shoppingList').innerHTML=state.shopping.map(x=>`<div class="item"><div style="flex:1;min-width:0"><label style="margin:0;display:flex;gap:8px;align-items:center"><input type="checkbox" data-bought="${x.id}" ${x.bought?'checked':''} style="width:18px;min-height:18px">${esc(x.name)}</label><small>${esc(x.quantity||'')}</small></div><div style="width:115px"><input aria-label="Giá dự kiến" data-price="${x.id}" type="number" min="0" value="${Number(x.price||0)}" style="padding:7px;font-size:13px"></div><button class="danger" data-shopdel="${x.id}">×</button></div>`).join('');
+ document.querySelectorAll('[data-bought]').forEach(el=>el.onchange=()=>{let x=state.shopping.find(y=>String(y.id)===el.dataset.bought);if(x){x.bought=el.checked;save()}});
+ document.querySelectorAll('[data-price]').forEach(el=>el.onchange=()=>{let x=state.shopping.find(y=>String(y.id)===el.dataset.price);if(x){x.price=Math.max(0,Number(el.value));save()}});
+ document.querySelectorAll('[data-shopdel]').forEach(el=>el.onclick=()=>{state.shopping=state.shopping.filter(x=>String(x.id)!==el.dataset.shopdel);save()});
+}
+document.getElementById('shoppingForm').onsubmit=e=>{e.preventDefault();let f=new FormData(e.target);state.shopping.push({id:Date.now(),name:f.get('name'),quantity:f.get('quantity'),price:Number(f.get('price')||0),bought:false});e.target.reset();save()};
+document.getElementById('saveBudget').onclick=()=>{state.budget=Math.max(0,Number(document.getElementById('settingsBudget').value)||0);save();alert('Đã lưu ngân sách.')};
+document.getElementById('exportData').onclick=()=>download('bep-nho-cua-son-backup-'+today+'.json',JSON.stringify({...state,exportedAt:new Date().toISOString(),app:'Bep nho cua Son'},null,2),'application/json');
+function download(name,data,type){let a=document.createElement('a'),url=URL.createObjectURL(new Blob([data],{type}));a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
+document.getElementById('exportCsv').onclick=()=>{let rows=[['Ngày','Tên khoản chi','Danh mục','Số tiền','Ghi chú'],...state.transactions.map(x=>[x.date,x.title,x.category,x.amount,x.note||''])];let csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');download('so-chi-tieu-'+today+'.csv',csv,'text/csv;charset=utf-8')};
+document.getElementById('importData').onclick=()=>{let file=document.getElementById('importFile').files[0];if(!file){alert('Bạn hãy chọn file JSON trước.');return}let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!Array.isArray(x.transactions)||!Array.isArray(x.shopping)||typeof x.budget!=='number')throw Error();if(confirm('Khôi phục sẽ thay thế dữ liệu hiện tại. Tiếp tục?')){state={budget:x.budget,transactions:x.transactions,shopping:x.shopping};save();alert('Đã khôi phục dữ liệu.')}}catch(e){alert('File sao lưu không hợp lệ.')}};r.readAsText(file)};
+document.getElementById('resetData').onclick=()=>{if(confirm('Bạn chắc chắn muốn xóa toàn bộ giao dịch và dữ liệu? Hãy sao lưu trước nếu cần.')){localStorage.removeItem(KEY);state=load();save();alert('Đã đặt lại dữ liệu.')}};
+render();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+</script>
+</body></html>
